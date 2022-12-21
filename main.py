@@ -235,11 +235,45 @@ def lexical():
         pass
 
 
-# ========파싱 시작========
-
+# ========파싱 시작 및 문법 확인========
 start()
 
+# ===========프로그램 실행=============
+activation_record_instance = {}
+next_func = False
+main_list = []
+func_list = [0,0]
+if not syntax_error:
+    for i in range(len(tokenized_text)):
+        if tokenized_text[i][0] == '{':
+            j = i
+            while 1:
+                if tokenized_text[j+1][0] == '}':
+                    break
+
+                j += 1
+                if tokenized_text[j][0] == "variable":
+                    while 1:
+                        j += 1
+                        if tokenized_text[j][0] != ';':
+                            if tokenized_text[j][1] == 11:
+                                if tokenized_text[i-1][0] == "main":
+                                    main_list.append(tokenized_text[j][0])
+                                else:
+                                    func_list.append(tokenized_text[j][0])
+                        else:
+                            break
+
+            if tokenized_text[i-1][0] == "main":
+                activation_record_instance[tokenized_text[i-1][0]]=main_list
+                main_list = []
+            else :
+                activation_record_instance[tokenized_text[i-1][0]]=func_list
+                func_list = [0, 0]
+            i = j
+
 print(tokenized_text)
+print(activation_record_instance)
 
 '''
 for i in tokenized_text:
