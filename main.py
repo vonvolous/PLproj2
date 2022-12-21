@@ -240,10 +240,30 @@ start()
 
 # ===========프로그램 실행=============
 activation_record_instance = {}
-next_func = False
+ari = [] # 진짜 ari
 main_list = []
 func_list = [0,0]
+dynamic_link = ["main",]
+function_line = 0
+function_idx = [] # tokenized_text에서 function들 있는 위치 기억하는 곳
+function_name = [] # tokenized_text에서 정의된 함수명 저장
+ep = 0
+main = False
+
 if not syntax_error:
+    # 함수 위치 알아내기
+    for i in range(len(tokenized_text)):
+        if tokenized_text[i][0] == '{':
+            function_name.append(tokenized_text[i-1][0])
+            function_idx.append(i-1)
+
+    # main 함수가 정의되지 않은 경우 오류 메세지 출력후 종료
+    if 'main' in function_name:
+        main = True
+    else:
+        print("“No starting function.”")
+
+    # 샘플 ari 만들어주기
     for i in range(len(tokenized_text)):
         if tokenized_text[i][0] == '{':
             j = i
@@ -272,8 +292,61 @@ if not syntax_error:
                 func_list = [0, 0]
             i = j
 
+    # main함수 있는 경우 프로그램 실행!
+    if main:
+        ari.append(['main', activation_record_instance['main']])
+        i = function_idx[function_name.index('main')]
+        i += 1 # '{'
+        while 1:
+            i += 1
+            if tokenized_text[i][0] == '}': # main 끝나면 종료
+                break
+            elif tokenized_text[i][0] == 'variable':
+                function_line -= 1
+            elif tokenized_text[i][0] == ';':
+                function_line += 1
+            elif tokenized_text[i][0] == 'call':
+                func_list = activation_record_instance[tokenized_text[i+1][0]]
+                func_list[0] = ['main', function_line + 1]
+                func_list[1] = ep
+                ep += 2
+                ari.append([tokenized_text[i+1][0], func_list])
+                func = tokenized_text[i+1][0]
+
+                # 메인에서 호출한 first 함수로 넘어감
+                j = function_idx[function_name.index(func)]
+                j += 1 # '{'
+                caller_func = func
+                while 1:
+                    j += 1
+                    function_line = 0
+                    if tokenized_text[j][0] == '}':  # sub function 끝나면 종료
+                        break
+                    elif tokenized_text[j][0] == 'variable':
+                        function_line -= 1
+                    elif tokenized_text[j][0] == ';':
+                        function_line += 1
+                    elif tokenized_text[j][0] == 'call':
+                        func_list = activation_record_instance[tokenized_text[j + 1][0]]
+                        func_list[0] = [caller_func, function_line + 1]
+                        func_list[1] = ep
+                        ep += len(func_list)
+                        ari.append([tokenized_text[j + 1][0], func_list])
+                        func = tokenized_text[j + 1][0]
+                func_list = [0,0]
+                i += 2
+
+
+    print("ari ", ari)
+    # ari에 dynamic link 넣어주기, ep 넣어주기...호출한 함수의 가장 밑의 주소
+    #for
+
+    # ari에 return address 넣어주기, 함수명: 실행문 위치
+
 print(tokenized_text)
 print(activation_record_instance)
+print(function_idx)
+print(function_name)
 
 '''
 for i in tokenized_text:
