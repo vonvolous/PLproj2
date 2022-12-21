@@ -12,6 +12,7 @@ semi_colon = 12  # ;
 comma = 13  # ,
 left_paren = 14  # {
 right_paren = 15  # }
+func_name = 16 # ident 중에서 함수명인지
 eof = 28  # $
 
 # global declarations
@@ -28,7 +29,7 @@ syntax_error_msg = "Syntax Error."
 syntax_ok_msg = "Syntax O.K."
 
 # for getting inputs from txt file
-f = open("sample.txt", 'r')  # txt파일 이름을 argv[1]로 인자로 받기
+f = open("sample.txt", 'r')  # txt파일 이름을 argv[1]로 인자로 받기 open(sys.argv[1], 'r')로 바꿔주기!!
 
 txt = f.readlines()
 input = ""
@@ -53,7 +54,7 @@ def functions(): # <functions> -> <function> | <function> <functions>
     else:
         pass
 def function(): # <function> -> <identifier> { <function_body> }
-    global syntax_error
+    global syntax_error, tokenized_text
     if next_token == ident:
         lexical()
         if next_token == left_paren:
