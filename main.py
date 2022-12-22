@@ -307,7 +307,38 @@ if not syntax_error:
             elif tokenized_text[i][0] == ';':
                 function_line += 1
             elif tokenized_text[i][0] == "print_ari":  # print_ari 나오면 ari 출력해주기
-                print("hi ari~", ari)
+                #print("hi ari~", ari)
+                for ari_idx in range(len(ari) - 1, -1, -1):
+                    for stack_idx in range(len(ari[ari_idx][1]) - 1, -1, -1):
+                        string_s = ""
+                        for blank in range(len(ari[ari_idx][0])+1):
+                            string_s += " "
+                        if ari[ari_idx][0] == 'main':
+                            if stack_idx == len(ari[ari_idx][1]) - 1:
+                                local_string = str(ari[ari_idx][0]) + ":Local variable: " + str(
+                                    ari[ari_idx][1][stack_idx])
+                                print(local_string)
+                            else:
+                                local_string = string_s+"Local variable: " + str(ari[ari_idx][1][stack_idx])
+                                print(local_string)
+                        else:
+                            if stack_idx == len(ari[ari_idx][1]) - 1:
+                                local_string = str(ari[ari_idx][0]) + ":Local variable: " + str(
+                                    ari[ari_idx][1][stack_idx])
+                                print(local_string)
+                            elif stack_idx == 0:  # ret
+                                ret_string = string_s+"Return Address: " + str(ari[ari_idx][1][stack_idx][0]) + ":" + str(
+                                    ari[ari_idx][1][stack_idx][1]) + "\n"
+                                print(ret_string)
+                            elif stack_idx == 1:  # dynamic link
+                                dynamic_string = string_s+"Dynamic Link: " + str(ari[ari_idx][1][stack_idx])
+                                print(dynamic_string)
+                            else:
+                                local_string = string_s+"Local variable: " + str(ari[ari_idx][1][stack_idx])
+                                print(local_string)
+
+                    if ari[ari_idx][0] == 'main':
+                        print("")
             elif (tokenized_text[i - 1][0] == '{' and tokenized_text[i][1] == 11) or (
                     tokenized_text[i - 1][0] == ';' and tokenized_text[i][1] == 11):
                 link_count = 0
@@ -362,7 +393,39 @@ if not syntax_error:
                     elif tokenized_text[j][0] == ';':
                         function_line1 += 1
                     elif tokenized_text[j][0] == "print_ari":  # print_ari 나오면 ari 출력해주기
-                        print("hi ari~", ari)
+                        #print("hi ari~", ari)
+                        for ari_idx in range(len(ari) - 1, -1, -1):
+                            for stack_idx in range(len(ari[ari_idx][1]) - 1, -1, -1):
+                                string_s = ""
+                                for blank in range(len(ari[ari_idx][0]) + 1):
+                                    string_s += " "
+                                if ari[ari_idx][0] == 'main':
+                                    if stack_idx == len(ari[ari_idx][1]) - 1:
+                                        local_string = str(ari[ari_idx][0]) + ":Local variable: " + str(
+                                            ari[ari_idx][1][stack_idx])
+                                        print(local_string)
+                                    else:
+                                        local_string = string_s+"Local variable: " + str(ari[ari_idx][1][stack_idx])
+                                        print(local_string)
+                                else:
+                                    if stack_idx == len(ari[ari_idx][1]) - 1:
+                                        local_string = str(ari[ari_idx][0]) + ":Local variable: " + str(
+                                            ari[ari_idx][1][stack_idx])
+                                        print(local_string)
+                                    elif stack_idx == 0:  # ret
+                                        ret_string = string_s+"Return Address: " + str(
+                                            ari[ari_idx][1][stack_idx][0]) + ":" + str(
+                                            ari[ari_idx][1][stack_idx][1]) + "\n"
+                                        print(ret_string)
+                                    elif stack_idx == 1:  # dynamic link
+                                        dynamic_string = string_s+"Dynamic Link: " + str(ari[ari_idx][1][stack_idx])
+                                        print(dynamic_string)
+                                    else:
+                                        local_string = string_s+"Local variable: " + str(ari[ari_idx][1][stack_idx])
+                                        print(local_string)
+
+                            if ari[ari_idx][0] == 'main':
+                                print("")
                     elif (tokenized_text[j - 1][0] == '{' and tokenized_text[j][1] == 11) or (
                             tokenized_text[j - 1][0] == ';' and tokenized_text[j][1] == 11):
                         link_count = 0
@@ -417,29 +480,32 @@ if not syntax_error:
                                 #print("hi ari!~", ari)
                                 for ari_idx in range(len(ari)-1,-1,-1):
                                     for stack_idx in range(len(ari[ari_idx][1])-1,-1,-1):
+                                        string_s = ""
+                                        for blank in range(len(ari[ari_idx][0]) + 1):
+                                            string_s += " "
                                         if ari[ari_idx][0] == 'main':
                                             if stack_idx == len(ari[ari_idx][1])-1:
                                                 local_string = str(ari[ari_idx][0])+":Local variable: "+str(ari[ari_idx][1][stack_idx])
                                                 print(local_string)
                                             else:
-                                                local_string = "Local variable: "+str(ari[ari_idx][1][stack_idx])
+                                                local_string = string_s+"Local variable: "+str(ari[ari_idx][1][stack_idx])
                                                 print(local_string)
                                         else:
                                             if stack_idx == len(ari[ari_idx][1])-1:
                                                 local_string = str(ari[ari_idx][0])+":Local variable: "+str(ari[ari_idx][1][stack_idx])
                                                 print(local_string)
                                             elif stack_idx == 0: # ret
-                                                ret_string = "Return Address: "+str(ari[ari_idx][1][stack_idx][0])+":"+str(ari[ari_idx][1][stack_idx][1])+"\n"
+                                                ret_string = string_s+"Return Address: "+str(ari[ari_idx][1][stack_idx][0])+":"+str(ari[ari_idx][1][stack_idx][1])+"\n"
                                                 print(ret_string)
                                             elif stack_idx == 1: # dynamic link
-                                                dynamic_string = "Dynamic Link: "+str(ari[ari_idx][1][stack_idx])
+                                                dynamic_string = string_s+"Dynamic Link: "+str(ari[ari_idx][1][stack_idx])
                                                 print(dynamic_string)
                                             else:
-                                                local_string = "Local variable: "+str(ari[ari_idx][1][stack_idx])
+                                                local_string = string_s+"Local variable: "+str(ari[ari_idx][1][stack_idx])
                                                 print(local_string)
 
                                     if ari[ari_idx][0] == 'main':
-                                        print("\n")
+                                        print("")
 
 
 
