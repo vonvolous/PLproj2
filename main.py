@@ -6,36 +6,40 @@ DIGIT = 1
 UNKNOWN = 99
 
 # token codes
-reserved_word = 10 # 예약어  call, variable, print_ari
-ident = 11  # 식별자 -> 영문자, 숫자, 밑줄(_)로 구성됨...첫 문자로 숫자가 나올 수 없음!
+reserved_word = 10 # reserved word : call, variable, print_ari
+ident = 11  # identifier -> letter, digit, underbar(_)...starting with letter or underbar(_)!
 semi_colon = 12  # ;
 comma = 13  # ,
 left_paren = 14  # {
 right_paren = 15  # }
-func_name = 16 # ident 중에서 함수명인지
-eof = 28  # $
+func_name = 16 # function name
+eof = 28  # $ eof
 
 # global declarations
-charClass = 0  # char가 digit/letter인지 판별
-token_string = ""  # lexeme 저장
-tokenized_text = [] # 토큰화한 것 저장
-token_index = 0  # input string의 인덱스
-nextChar = ""  # 다음 문자받는 변수
-next_token = 0  # token type 저장
+charClass = 0  # Is character digit/letter
+token_string = ""  # save lexeme
+tokenized_text = [] # tokenized input
+token_index = 0  # input string's index
+nextChar = ""  # get next character in input string
+next_token = 0  # save token type
 
 # error declarations
 syntax_error = False
 syntax_error_msg = "Syntax Error.\n"
 syntax_ok_msg = "Syntax O.K.\n"
 
+# ======================================================
+
 # for getting inputs from txt file
-f = open("sample.txt", 'r')  # txt파일 이름을 argv[1]로 인자로 받기 open(sys.argv[1], 'r')로 바꿔주기!!
+f = open(sys.argv[1], 'r')
 
 txt = f.readlines()
 input = ""
 for statement in txt:
     input += statement.strip()
 input += "$"
+
+# ======================================================
 
 # functions for grammar
 def start(): # <start> -> <functions>
@@ -64,7 +68,7 @@ def function(): # <function> -> <identifier> { <function_body> }
                 lexical()
             else :
                 syntax_error = True
-                print("오른쪽 괄호가 없음 function()")
+                #print("오른쪽 괄호가 없음 function()")
 
 def function_body(): # <function_body> -> <var_definitions> <statements> | <statements>
     if next_token == reserved_word and token_string == "variable":
@@ -92,10 +96,10 @@ def var_definition(): # <var_definition> -> variable <var_list> ;
             pass
         else:
             syntax_error = True
-            print("var_definition() 세미콜론 없음")
+            #print("var_definition() 세미콜론 없음")
     else:
         syntax_error = True
-        print("var_definition() variable로 시작 안함")
+        #print("var_definition() variable로 시작 안함")
 def var_list(): # <var_list> -> <identifier> | <identifier>, <var_list>
     if next_token == ident:
         lexical()
@@ -122,26 +126,28 @@ def statement(): # <statement> -> call <identifier>; | print_ari; | <identifier>
                 pass
             else:
                 syntax_error =True
-                print("statement() call ident 뒤에 세미콜론 없음")
+                #print("statement() call ident 뒤에 세미콜론 없음")
         else:
             syntax_error = True
-            print("staement() call 뒤에 ident 없음")
+            #print("staement() call 뒤에 ident 없음")
     elif next_token == reserved_word and token_string == "print_ari":
         lexical()
         if next_token == semi_colon:
             pass
         else:
             syntax_error = True
-            print("statement() print_ari뒤에 세미콜론 없음")
+            #print("statement() print_ari뒤에 세미콜론 없음")
     elif next_token == ident:
         lexical()
         if next_token == semi_colon:
             pass
         else:
             syntax_error = True
-            print("statement() ident 뒤에 세미콜론 없음")
+            #print("statement() ident 뒤에 세미콜론 없음")
     else:
         pass
+
+# ======================================================
 
 # functions for lexical()
 def lookup(ch):
@@ -181,8 +187,8 @@ def getChar():
     token_index += 1
 
     if nextChar != '$':
-        if nextChar.isalpha() or nextChar == '_':  # c identifier rule에서 ident은 영문자, 밑줄문자(_), 숫자(0~9)를 가질 수 있으므로
-            charClass = LETTER  # 영문자와 밑줄문자를 letter로 인식하도록 했다.
+        if nextChar.isalpha() or nextChar == '_':  # In c identifier rule, identifier can have letter, digit , or underbar(_)
+            charClass = LETTER  # let letter and underbar(_) be letter charClass
         elif nextChar.isdigit():
             charClass = DIGIT
         else:
@@ -191,7 +197,7 @@ def getChar():
         charClass = eof
 
 
-def getNonBlank():
+def getNonBlank(): # skip the blanks
     while nextChar.isspace():
         getChar()
 
@@ -201,7 +207,7 @@ def lexical():
     token_string = ""
     getNonBlank()
 
-    if charClass == LETTER:  # ident의 시작은 숫자로 할 수는 없으므로 처음에는 영문자나 밑줄(_)이어야 한다.
+    if charClass == LETTER:  # identifier must start with letter or underbar(_), not digit
         addChar()
         getChar()
         while charClass == LETTER or charClass == DIGIT:
@@ -230,40 +236,39 @@ def lexical():
         next_token = eof
         tokenized_text.append([token_string, next_token])
 
-    # 입력한 파일에 대한 파싱 결과 출력 부분
     if next_token == eof:
         pass
 
 
-# ========파싱 시작 및 문법 확인========
+# =========start parsing and check the grammar=========
 start()
 
-# ===========프로그램 실행=============
-activation_record_instance = {}
-ari = [] # 진짜 ari
-main_list = []
-func_list = [0,0]
-dynamic_link = ["main",]
-function_line = 0
-function_idx = [] # tokenized_text에서 function들 있는 위치 기억하는 곳
-function_name = [] # tokenized_text에서 정의된 함수명 저장
-ep = 0
-main = False
+# =======execute the program with main function========
+activation_record_instance = {} # sample ari
+ari = [] # ari
+main_list = [] # save the  temp ari of main
+func_list = [0,0] # save the temp ari of other sub function
+dynamic_link = ["main",] # save the dynamic call
+function_line = 0 # execute statement count
+function_idx = [] # position of functions in tokenized_text
+function_name = [] # save function name declared in tokenized_text
+ep = 0 # save EP point
+main = False # flag that tells us the function is main or not
 
 if not syntax_error:
-    # 함수 위치 알아내기
+    # find the function name position
     for i in range(len(tokenized_text)):
         if tokenized_text[i][0] == '{':
             function_name.append(tokenized_text[i-1][0])
             function_idx.append(i-1)
 
-    # main 함수가 정의되지 않은 경우 오류 메세지 출력후 종료
+    # if main function is not declared, then print error msg and exit
     if 'main' in function_name:
         main = True
     else:
         print("“No starting function.”")
 
-    # 샘플 ari 만들어주기
+    # making sample ari
     for i in range(len(tokenized_text)):
         if tokenized_text[i][0] == '{':
             j = i
@@ -292,7 +297,7 @@ if not syntax_error:
                 func_list = [0, 0]
             i = j
 
-    # main함수 있는 경우 프로그램 실행!
+    # if there is main function, then execute the program!
     if main:
         caller_func=''
         ari.append(['main', activation_record_instance['main']])
@@ -300,13 +305,13 @@ if not syntax_error:
         i += 1 # '{'
         while 1:
             i += 1
-            if tokenized_text[i][0] == '}': # main 끝나면 종료
+            if tokenized_text[i][0] == '}': # if main ends, exit the program
                 break
             elif tokenized_text[i][0] == 'variable':
                 function_line -= 1
             elif tokenized_text[i][0] == ';':
                 function_line += 1
-            elif tokenized_text[i][0] == "print_ari":  # print_ari 나오면 ari 출력해주기
+            elif tokenized_text[i][0] == "print_ari":  # if there is print_ari, print ari
                 #print("hi ari~", ari)
                 for ari_idx in range(len(ari) - 1, -1, -1):
                     for stack_idx in range(len(ari[ari_idx][1]) - 1, -1, -1):
@@ -546,20 +551,5 @@ if not syntax_error:
                 func_list = [0,0]
                 i += 1
 
-
-    #print("ari ", ari)
-
-    # ari에 dynamic link 넣어주기, ep 넣어주기...호출한 함수의 가장 밑의 주소
-    #for
-
-    # ari에 return address 넣어주기, 함수명: 실행문 위치
-
 #print(tokenized_text)
 #print(activation_record_instance)
-#print(function_idx)
-#print(function_name)
-
-'''
-for i in tokenized_text:
-    print(i[0])
-'''
